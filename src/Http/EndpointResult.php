@@ -6,6 +6,9 @@ namespace SharadKashyap\ApiEndpointDiagnosticTool\Http;
 
 final readonly class EndpointResult
 {
+    /**
+     * @param array<string, list<string>> $responseHeaders
+     */
     public function __construct(
         public string $url,
         public bool $reachable,
@@ -14,6 +17,8 @@ final readonly class EndpointResult
         public string $responseBody,
         public ?string $transportError,
         public float $durationMilliseconds,
+        public ?string $effectiveUrl = null,
+        public array $responseHeaders = [],
     ) {
     }
 }

@@ -14,6 +14,7 @@ final readonly class CurlEndpointProbe implements EndpointProbe
     public function probe(EndpointRequest $request): EndpointResult
     {
         $handle = curl_init($request->url);
+        $responseHeaders = [];
 
         $options = [
             CURLOPT_RETURNTRANSFER => true,
@@ -29,6 +30,29 @@ final readonly class CurlEndpointProbe implements EndpointProbe
                 ],
                 $request->headers,
             ),
+            CURLOPT_HEADERFUNCTION => static function (
+                mixed $_handle,
+                string $headerLine,
+            ) use (&$responseHeaders): int {
+                $lineLength = strlen($headerLine);
+                $headerLine = trim($headerLine);
+
+                if (str_starts_with($headerLine, 'HTTP/')) {
+                    $responseHeaders = [];
+
+                    return $lineLength;
+                }
+
+                if ($headerLine === '' || !str_contains($headerLine, ':')) {
+                    return $lineLength;
+                }
+
+                [$name, $value] = explode(':', $headerLine, 2);
+                $name = strtolower(trim($name));
+                $responseHeaders[$name][] = trim($value);
+
+                return $lineLength;
+            },
         ];
 
         if ($request->body !== null) {
@@ -45,6 +69,7 @@ final readonly class CurlEndpointProbe implements EndpointProbe
         $statusCode = curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
         $contentType = curl_getinfo($handle, CURLINFO_CONTENT_TYPE);
         $durationSeconds = curl_getinfo($handle, CURLINFO_TOTAL_TIME);
+        $effectiveUrl = curl_getinfo($handle, CURLINFO_EFFECTIVE_URL);
 
         curl_close($handle);
 
@@ -56,6 +81,8 @@ final readonly class CurlEndpointProbe implements EndpointProbe
             responseBody: is_string($responseBody) ? $responseBody : '',
             transportError: $transportError,
             durationMilliseconds: round($durationSeconds * 1000, 2),
+            effectiveUrl: is_string($effectiveUrl) ? $effectiveUrl : null,
+            responseHeaders: $responseHeaders,
         );
     }
 }
