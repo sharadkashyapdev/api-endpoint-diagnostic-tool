@@ -20,6 +20,8 @@ final readonly class CurlEndpointProbe implements EndpointProbe
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => 5,
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
             CURLOPT_CONNECTTIMEOUT => $this->timeoutSeconds,
             CURLOPT_TIMEOUT => $this->timeoutSeconds,
             CURLOPT_CUSTOMREQUEST => $request->method,

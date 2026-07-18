@@ -21,6 +21,12 @@ final readonly class EndpointRequest
             throw new InvalidArgumentException('A valid endpoint URL is required.');
         }
 
+        $scheme = parse_url($this->url, PHP_URL_SCHEME);
+
+        if (!is_string($scheme) || !in_array(strtolower($scheme), ['http', 'https'], true)) {
+            throw new InvalidArgumentException('Only HTTP and HTTPS endpoint URLs are supported.');
+        }
+
         if (!in_array($this->method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], true)) {
             throw new InvalidArgumentException('Unsupported HTTP method.');
         }
