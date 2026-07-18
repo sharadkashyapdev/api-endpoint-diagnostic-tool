@@ -6,7 +6,7 @@
 
 A framework-independent PHP tool that checks API endpoints, explains likely failure causes, and recommends the next diagnostic action.
 
-> Project status: Under active development.
+> Project status: Stable release v1.0.0.
 
 ## Key Capabilities
 
