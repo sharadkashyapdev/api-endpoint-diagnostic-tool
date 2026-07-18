@@ -83,7 +83,7 @@ final readonly class CurlEndpointProbe implements EndpointProbe
             responseBody: is_string($responseBody) ? $responseBody : '',
             transportError: $transportError,
             durationMilliseconds: round($durationSeconds * 1000, 2),
-            effectiveUrl: is_string($effectiveUrl) ? $effectiveUrl : null,
+            effectiveUrl: $effectiveUrl !== '' ? $effectiveUrl : null,
             responseHeaders: $responseHeaders,
         );
     }

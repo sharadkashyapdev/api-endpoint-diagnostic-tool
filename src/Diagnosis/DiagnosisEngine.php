@@ -58,6 +58,9 @@ final class DiagnosisEngine
         );
     }
 
+    /**
+     * @return array{string, string}
+     */
     private function interpretStatus(int $statusCode): array
     {
         return match ($statusCode) {
