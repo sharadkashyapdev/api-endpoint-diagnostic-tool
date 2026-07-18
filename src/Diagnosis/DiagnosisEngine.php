@@ -8,16 +8,22 @@ use SharadKashyap\ApiEndpointDiagnosticTool\Http\EndpointResult;
 
 final class DiagnosisEngine
 {
+    public function __construct(
+        private readonly TransportFailureAnalyzer $transportFailureAnalyzer = new TransportFailureAnalyzer(),
+    ) {
+    }
     public function diagnose(EndpointResult $result): DiagnosticReport
     {
         if (!$result->reachable) {
+            $transportDiagnosis = $this->transportFailureAnalyzer->analyze($result->transportError);
+
             return new DiagnosticReport(
                 requestSuccessful: false,
                 endpointReachable: false,
                 httpStatus: null,
                 responseType: 'No response',
-                likelyCause: $result->transportError ?? 'Endpoint could not be reached.',
-                suggestedCheck: 'Verify the URL, DNS, network connection, SSL certificate, and server availability.',
+                likelyCause: $transportDiagnosis['likelyCause'],
+                suggestedCheck: $transportDiagnosis['suggestedCheck'],
                 durationMilliseconds: $result->durationMilliseconds,
             );
         }

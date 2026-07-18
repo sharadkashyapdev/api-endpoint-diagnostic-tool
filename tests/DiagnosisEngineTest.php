@@ -69,6 +69,7 @@ final class DiagnosisEngineTest extends TestCase
         self::assertFalse($report->endpointReachable);
         self::assertNull($report->httpStatus);
         self::assertSame('No response', $report->responseType);
-        self::assertSame('Could not resolve host', $report->likelyCause);
+        self::assertSame('DNS resolution failed for the endpoint host.', $report->likelyCause);
+        self::assertSame('Verify the hostname, DNS records, and local DNS resolver.', $report->suggestedCheck);
     }
 }
