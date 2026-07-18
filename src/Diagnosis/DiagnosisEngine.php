@@ -11,8 +11,10 @@ final class DiagnosisEngine
     public function __construct(
         private readonly TransportFailureAnalyzer $transportFailureAnalyzer = new TransportFailureAnalyzer(),
         private readonly ResponseHeaderAnalyzer $responseHeaderAnalyzer = new ResponseHeaderAnalyzer(),
+        private readonly ResponseConsistencyAnalyzer $responseConsistencyAnalyzer = new ResponseConsistencyAnalyzer(),
     ) {
     }
+
     public function diagnose(EndpointResult $result): DiagnosticReport
     {
         if (!$result->reachable) {
@@ -36,6 +38,14 @@ final class DiagnosisEngine
             headers: $result->responseHeaders,
             suggestedCheck: $suggestedCheck,
         );
+
+        $consistencyDiagnosis = $this->responseConsistencyAnalyzer->analyze(
+            result: $result,
+            likelyCause: $likelyCause,
+            suggestedCheck: $suggestedCheck,
+        );
+        $likelyCause = $consistencyDiagnosis['likelyCause'];
+        $suggestedCheck = $consistencyDiagnosis['suggestedCheck'];
 
         return new DiagnosticReport(
             requestSuccessful: $statusCode >= 200 && $statusCode < 300,
