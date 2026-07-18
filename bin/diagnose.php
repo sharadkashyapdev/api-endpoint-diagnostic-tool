@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use SharadKashyap\ApiEndpointDiagnosticTool\Diagnosis\DiagnosisEngine;
 use SharadKashyap\ApiEndpointDiagnosticTool\Http\CurlEndpointProbe;
+use SharadKashyap\ApiEndpointDiagnosticTool\Http\EndpointRequest;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -15,7 +16,7 @@ if ($url === null) {
 }
 
 try {
-    $result = (new CurlEndpointProbe())->probe($url);
+    $result = (new CurlEndpointProbe())->probe(new EndpointRequest(url: $url));
     $report = (new DiagnosisEngine())->diagnose($result);
 
     echo 'Request Status: ' . ($report->requestSuccessful ? 'Successful' : 'Failed') . PHP_EOL;

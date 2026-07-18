@@ -6,5 +6,5 @@ namespace SharadKashyap\ApiEndpointDiagnosticTool\Http;
 
 interface EndpointProbe
 {
-    public function probe(string $url): EndpointResult;
+    public function probe(EndpointRequest $request): EndpointResult;
 }

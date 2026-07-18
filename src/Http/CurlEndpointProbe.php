@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace SharadKashyap\ApiEndpointDiagnosticTool\Http;
 
-use InvalidArgumentException;
-
 final readonly class CurlEndpointProbe implements EndpointProbe
 {
     public function __construct(
@@ -13,25 +11,31 @@ final readonly class CurlEndpointProbe implements EndpointProbe
     ) {
     }
 
-    public function probe(string $url): EndpointResult
+    public function probe(EndpointRequest $request): EndpointResult
     {
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            throw new InvalidArgumentException('A valid endpoint URL is required.');
-        }
+        $handle = curl_init($request->url);
 
-        $handle = curl_init($url);
-
-        curl_setopt_array($handle, [
+        $options = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => 5,
             CURLOPT_CONNECTTIMEOUT => $this->timeoutSeconds,
             CURLOPT_TIMEOUT => $this->timeoutSeconds,
-            CURLOPT_HTTPHEADER => [
-                'Accept: application/json',
-                'User-Agent: API-Endpoint-Diagnostic-Tool/0.1',
-            ],
-        ]);
+            CURLOPT_CUSTOMREQUEST => $request->method,
+            CURLOPT_HTTPHEADER => array_merge(
+                [
+                    'Accept: application/json',
+                    'User-Agent: API-Endpoint-Diagnostic-Tool/0.1',
+                ],
+                $request->headers,
+            ),
+        ];
+
+        if ($request->body !== null) {
+            $options[CURLOPT_POSTFIELDS] = $request->body;
+        }
+
+        curl_setopt_array($handle, $options);
 
         $responseBody = curl_exec($handle);
         $transportError = curl_errno($handle) !== 0
@@ -45,7 +49,7 @@ final readonly class CurlEndpointProbe implements EndpointProbe
         curl_close($handle);
 
         return new EndpointResult(
-            url: $url,
+            url: $request->url,
             reachable: $transportError === null && $statusCode > 0,
             statusCode: $statusCode > 0 ? $statusCode : null,
             contentType: is_string($contentType) ? $contentType : null,
