@@ -97,11 +97,47 @@ final class DiagnosisEngine
                 'A gateway timed out while waiting for an upstream service.',
                 'Inspect upstream response time, proxy timeout settings, and dependencies.',
             ],
-            default => [
-                'The endpoint returned an unclassified HTTP status.',
-                'Inspect the response body, headers, and API documentation.',
-            ],
+            default => $this->interpretStatusFamily($statusCode),
         };
+    }
+
+    /**
+     * @return array{string, string}
+     */
+    private function interpretStatusFamily(int $statusCode): array
+    {
+        if ($statusCode >= 200 && $statusCode < 300) {
+            return [
+                'The endpoint responded successfully.',
+                'No corrective action is required.',
+            ];
+        }
+
+        if ($statusCode >= 300 && $statusCode < 400) {
+            return [
+                'The endpoint returned a redirection response.',
+                'Inspect the Location header, redirect target, and client redirect policy.',
+            ];
+        }
+
+        if ($statusCode >= 400 && $statusCode < 500) {
+            return [
+                'The endpoint rejected the request with a client error.',
+                'Inspect the request method, headers, parameters, body, and API documentation.',
+            ];
+        }
+
+        if ($statusCode >= 500 && $statusCode < 600) {
+            return [
+                'The endpoint failed while processing a valid request.',
+                'Inspect server logs, service health, dependencies, and recent deployments.',
+            ];
+        }
+
+        return [
+            'The endpoint returned an unclassified HTTP status.',
+            'Inspect the response body, headers, and API documentation.',
+        ];
     }
 
     private function detectResponseType(EndpointResult $result): string
