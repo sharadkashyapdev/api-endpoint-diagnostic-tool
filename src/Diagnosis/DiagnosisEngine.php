@@ -10,6 +10,7 @@ final class DiagnosisEngine
 {
     public function __construct(
         private readonly TransportFailureAnalyzer $transportFailureAnalyzer = new TransportFailureAnalyzer(),
+        private readonly ResponseHeaderAnalyzer $responseHeaderAnalyzer = new ResponseHeaderAnalyzer(),
     ) {
     }
     public function diagnose(EndpointResult $result): DiagnosticReport
@@ -30,6 +31,11 @@ final class DiagnosisEngine
 
         $statusCode = $result->statusCode ?? 0;
         [$likelyCause, $suggestedCheck] = $this->interpretStatus($statusCode);
+        $suggestedCheck = $this->responseHeaderAnalyzer->refineSuggestion(
+            statusCode: $statusCode,
+            headers: $result->responseHeaders,
+            suggestedCheck: $suggestedCheck,
+        );
 
         return new DiagnosticReport(
             requestSuccessful: $statusCode >= 200 && $statusCode < 300,
