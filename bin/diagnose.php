@@ -6,6 +6,7 @@ use SharadKashyap\ApiEndpointDiagnosticTool\Diagnosis\DiagnosisEngine;
 use SharadKashyap\ApiEndpointDiagnosticTool\Http\CurlEndpointProbe;
 use SharadKashyap\ApiEndpointDiagnosticTool\Http\EndpointRequest;
 use SharadKashyap\ApiEndpointDiagnosticTool\Output\JsonReportFormatter;
+use SharadKashyap\ApiEndpointDiagnosticTool\Output\SensitiveDataRedactor;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -25,12 +26,16 @@ try {
         exit(0);
     }
 
+    $redactor = new SensitiveDataRedactor();
+    $likelyCause = $redactor->redact($report->likelyCause);
+    $suggestedCheck = $redactor->redact($report->suggestedCheck);
+
     echo 'Request Status: ' . ($report->requestSuccessful ? 'Successful' : 'Failed') . PHP_EOL;
     echo 'Endpoint Reachable: ' . ($report->endpointReachable ? 'Yes' : 'No') . PHP_EOL;
     echo 'HTTP Status: ' . ($report->httpStatus ?? 'Unavailable') . PHP_EOL;
     echo 'Response Type: ' . $report->responseType . PHP_EOL;
-    echo 'Likely Cause: ' . $report->likelyCause . PHP_EOL;
-    echo 'Suggested Check: ' . $report->suggestedCheck . PHP_EOL;
+    echo 'Likely Cause: ' . $likelyCause . PHP_EOL;
+    echo 'Suggested Check: ' . $suggestedCheck . PHP_EOL;
     echo 'Duration: ' . $report->durationMilliseconds . ' ms' . PHP_EOL;
 } catch (Throwable $exception) {
     fwrite(STDERR, 'Diagnostic failed: ' . $exception->getMessage() . PHP_EOL);
