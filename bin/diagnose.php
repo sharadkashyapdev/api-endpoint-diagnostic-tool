@@ -8,7 +8,10 @@ use SharadKashyap\ApiEndpointDiagnosticTool\Http\EndpointRequest;
 use SharadKashyap\ApiEndpointDiagnosticTool\Output\JsonReportFormatter;
 use SharadKashyap\ApiEndpointDiagnosticTool\Output\SensitiveDataRedactor;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+$consumerAutoload = dirname(__DIR__, 3) . '/autoload.php';
+$packageAutoload = dirname(__DIR__) . '/vendor/autoload.php';
+
+require is_file($consumerAutoload) ? $consumerAutoload : $packageAutoload;
 
 $url = $argv[1] ?? null;
 

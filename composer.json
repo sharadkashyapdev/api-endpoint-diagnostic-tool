@@ -1,31 +1,34 @@
 {
-    "name": "sharadkashyap/api-endpoint-diagnostic-tool",
-    "description": "A framework-independent tool for diagnosing API endpoint failures and suggesting actionable checks.",
-    "type": "project",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "SharadKashyap\\ApiEndpointDiagnosticTool\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "SharadKashyap\\ApiEndpointDiagnosticTool\\Tests\\": "tests/"
-        }
-    },
-    "require": {
-        "php": "^8.2"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^11.5",
-        "phpstan/phpstan": "^2.1"
-    },
-    "scripts": {
-        "test": "phpunit tests",
-        "analyse": "phpstan analyse",
-        "quality": [
-            "@test",
-            "@analyse"
-        ]
-    }
+    "name":  "sharadkashyap/api-endpoint-diagnostic-tool",
+    "description":  "A framework-independent tool for diagnosing API endpoint failures and suggesting actionable checks.",
+    "type":  "library",
+    "license":  "MIT",
+    "autoload":  {
+                     "psr-4":  {
+                                   "SharadKashyap\\ApiEndpointDiagnosticTool\\":  "src/"
+                               }
+                 },
+    "autoload-dev":  {
+                         "psr-4":  {
+                                       "SharadKashyap\\ApiEndpointDiagnosticTool\\Tests\\":  "tests/"
+                                   }
+                     },
+    "require":  {
+                    "php":  "^8.2"
+                },
+    "require-dev":  {
+                        "phpunit/phpunit":  "^11.5",
+                        "phpstan/phpstan":  "^2.1"
+                    },
+    "scripts":  {
+                    "test":  "phpunit tests",
+                    "analyse":  "phpstan analyse",
+                    "quality":  [
+                                    "@test",
+                                    "@analyse"
+                                ]
+                },
+    "bin":  [
+                "bin/diagnose.php"
+            ]
 }
